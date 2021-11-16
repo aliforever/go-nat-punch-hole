@@ -60,11 +60,22 @@ func main() {
 			return
 		}
 
-		err = udpClient.ConnectToPeer(peerAddr)
-		if err != nil {
-			fmt.Println(err)
-			return
+		/*if strings.Contains(args.LocalAddress, "8182") {
+			peerAddr, _ = net.ResolveUDPAddr("udp", "5.122.40.48:8183")
+		} else if strings.Contains(args.LocalAddress, "8183") {
+			peerAddr, _ = net.ResolveUDPAddr("udp", "5.122.40.48:8182")
+		}*/
+
+		for true {
+			err = udpClient.ConnectToPeer(peerAddr)
+			if err != nil {
+				fmt.Println(err)
+				time.Sleep(time.Second * 1)
+				continue
+			}
+			time.Sleep(time.Second * 1)
 		}
+
 	}
 
 	for true {

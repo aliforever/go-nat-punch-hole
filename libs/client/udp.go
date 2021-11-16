@@ -112,6 +112,7 @@ func (u *UDP) Register(roomName string) (success bool, err error) {
 }
 
 func (u *UDP) ConnectToPeer(peerAddress *net.UDPAddr) (err error) {
+	fmt.Println("Attempting to connect to", peerAddress.String())
 	_, err = u.conn.WriteToUDP(makeRequestBytes(3, []byte("MESSAGE"), []byte("Hello")), peerAddress)
 	return
 }
