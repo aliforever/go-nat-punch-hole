@@ -111,6 +111,22 @@ func (u *UDP) Register(roomName string) (success bool, err error) {
 	return
 }
 
+func (u *UDP) RemoveRoom(roomName string) (success bool, err error) {
+	_, err = u.conn.WriteToUDP(makeRequestBytes(1, deleteRoomAction, []byte(roomName)), u.signalingServerAddr)
+	if err != nil {
+		return
+	}
+
+	var ch = make(chan []byte)
+	u.responseChan.addChannel(1, ch)
+
+	data := <-ch
+	if string(data) == "OK" {
+		success = true
+	}
+	return
+}
+
 func (u *UDP) ConnectToPeer(peerAddress *net.UDPAddr) (err error) {
 	fmt.Println("Attempting to connect to", peerAddress.String())
 	_, err = u.conn.WriteToUDP(makeRequestBytes(3, []byte("MESSAGE"), []byte("Hello")), peerAddress)

@@ -63,19 +63,22 @@ func (u *UDP) processUpdates(conn *net.UDPConn) (err error) {
 
 		if bytes.Equal(byteData[0], registerAction) {
 			u.peers.storePeer(string(byteData[1]), udpAddr)
-			conn.WriteToUDP(makeResponseBytes(requestId, ok), udpAddr)
+			conn.WriteToUDP(makeResponseBytes(requestId, okMessage), udpAddr)
 			fmt.Println("stored peer", udpAddr.String())
 		} else if bytes.Equal(byteData[0], findPeerByNameAction) {
 			// Find Peer By Name
 			peer, _ := u.peers.findPeer(string(byteData[1]), udpAddr)
 			if peer == nil {
-				conn.WriteToUDP(makeResponseBytes(requestId, peerNotFound), udpAddr)
+				conn.WriteToUDP(makeResponseBytes(requestId, peerNotFoundMessage), udpAddr)
 			} else {
 				conn.WriteToUDP(makeResponseBytes(requestId, []byte(peer.String())), udpAddr)
 			}
+		} else if bytes.Equal(byteData[0], deleteRoomAction) {
+			u.peers.removeRoom(string(byteData[1]))
+			conn.WriteToUDP(makeResponseBytes(requestId, okMessage), udpAddr)
 		} else {
 			err = errors.New("connection_closed_due_to_invalid_action")
-			conn.WriteToUDP(makeResponseBytes(requestId, invalidAction), udpAddr)
+			conn.WriteToUDP(makeResponseBytes(requestId, invalidActionMessage), udpAddr)
 			break
 		}
 	}

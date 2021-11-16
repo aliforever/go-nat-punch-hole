@@ -60,6 +60,8 @@ func main() {
 			return
 		}
 
+		udpClient.RemoveRoom("test_room")
+
 		/*if strings.Contains(args.LocalAddress, "8182") {
 			peerAddr, _ = net.ResolveUDPAddr("udp", "5.122.40.48:8183")
 		} else if strings.Contains(args.LocalAddress, "8183") {

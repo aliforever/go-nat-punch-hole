@@ -1,9 +1,9 @@
 package server
 
 var (
-	ok            = []byte("OK")
-	peerNotFound  = []byte("PEER_NOT_FOUND")
-	invalidAction = []byte("INVALID_ACTION")
+	okMessage            = []byte("OK")
+	peerNotFoundMessage  = []byte("PEER_NOT_FOUND")
+	invalidActionMessage = []byte("INVALID_ACTION")
 )
 
 func makeResponseBytes(requestId int64, data []byte) (responseBytes []byte) {

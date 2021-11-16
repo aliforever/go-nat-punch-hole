@@ -21,6 +21,12 @@ func (ps *peerStorage) storePeer(name string, peer *net.UDPAddr) {
 	ps.peers[name] = append(ps.peers[name], peer)
 }
 
+func (ps *peerStorage) removeRoom(name string) {
+	ps.Lock()
+	defer ps.Unlock()
+	delete(ps.peers, name)
+}
+
 func (ps *peerStorage) findPeer(name string, currentPeer *net.UDPAddr) (peer *net.UDPAddr, err error) {
 	ps.Lock()
 	defer ps.Unlock()
