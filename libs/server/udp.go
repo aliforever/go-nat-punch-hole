@@ -40,8 +40,11 @@ func (u *UDP) processUpdates(conn *net.UDPConn) (err error) {
 	for {
 		var buffer = make([]byte, 2048)
 
-		var readCount int
-		readCount, err = conn.Read(buffer)
+		var (
+			readCount int
+			udpAddr   *net.UDPAddr
+		)
+		readCount, udpAddr, err = conn.ReadFromUDP(buffer)
 		if err != nil {
 			break
 		}
@@ -59,20 +62,20 @@ func (u *UDP) processUpdates(conn *net.UDPConn) (err error) {
 		byteData := bytes.Split(data, actionsSplitterBytes)
 
 		if bytes.Equal(byteData[0], registerAction) {
-			u.peers.storePeer(string(byteData[1]), conn)
-			conn.Write(makeResponseBytes(requestId, ok))
-			fmt.Println("registered peer")
+			u.peers.storePeer(string(byteData[1]), udpAddr)
+			conn.WriteToUDP(makeResponseBytes(requestId, ok), udpAddr)
+			fmt.Println("stored peer", udpAddr.String())
 		} else if bytes.Equal(byteData[0], findPeerByNameAction) {
 			// Find Peer By Name
-			peer, _ := u.peers.findPeer(string(byteData[1]), conn)
+			peer, _ := u.peers.findPeer(string(byteData[1]), udpAddr)
 			if peer == nil {
-				conn.Write(makeResponseBytes(requestId, peerNotFound))
+				conn.WriteToUDP(makeResponseBytes(requestId, peerNotFound), udpAddr)
 			} else {
-				conn.Write(makeResponseBytes(requestId, []byte(peer.RemoteAddr().String())))
+				conn.WriteToUDP(makeResponseBytes(requestId, []byte(peer.String())), udpAddr)
 			}
 		} else {
 			err = errors.New("connection_closed_due_to_invalid_action")
-			conn.Write(makeResponseBytes(requestId, invalidAction))
+			conn.WriteToUDP(makeResponseBytes(requestId, invalidAction), udpAddr)
 			break
 		}
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/aliforever/go-nat-punch-hole/libs/client"
@@ -34,9 +35,36 @@ func main() {
 		if err != nil {
 			panic(fmt.Sprintf("Error in udp client: %s", err))
 		}
-		fmt.Println("here now")
 		ok, err := udpClient.Register("test_room")
-		fmt.Println(ok, err)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		if !ok {
+			return
+		}
+
+		var peerAddr *net.UDPAddr
+		for {
+			peerAddr, err = udpClient.GetPeerAddress("test_room")
+			if err != nil {
+				fmt.Println(err)
+				time.Sleep(time.Second * 1)
+				continue
+			}
+			fmt.Printf("peer address is: %s\n", peerAddr)
+			break
+		}
+
+		if peerAddr == nil {
+			return
+		}
+
+		err = udpClient.ConnectToPeer(peerAddr)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 
 	for true {
