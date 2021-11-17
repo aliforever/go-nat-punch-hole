@@ -60,6 +60,7 @@ func main() {
 			return
 		}
 
+		time.Sleep(time.Second * 1)
 		udpClient.RemoveRoom("test_room")
 
 		/*if strings.Contains(args.LocalAddress, "8182") {
